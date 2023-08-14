@@ -138,6 +138,39 @@ def handle_csv_out(csv_q, thrd_done):
         csv_fp.flush()
     csv_fp.close()
     print(colored(f'Closing file: {fName}', 'blue'))
+    
+    input_csv_filename = OUTPUT_CSV  
+    output_base_filename = "output"   # Base name for output CSV files
+
+    # Open the input CSV file for reading
+    with open(input_csv_filename, "r", newline="") as input_csv_file:
+        reader = csv.reader(input_csv_file)
+        header = next(reader)  # Read the header row
+
+        # Create a dictionary to store separate output file handlers
+        output_files = {}
+
+        for row in reader:
+            # Assuming the row contains an identifier in the first column
+            identifier = row[0]
+            output_filename = f"{output_base_filename}_{identifier}.csv"
+
+            # If the output file for this identifier is not open yet, open it
+            if identifier not in output_files:
+                output_files[identifier] = open(output_filename, "w", newline="")
+                writer = csv.writer(output_files[identifier])
+                writer.writerow(header)
+
+            # Write the row to the appropriate output file
+            writer.writerow(row)
+
+        # Close all the output files
+        for output_file in output_files.values():
+            output_file.close()
+
+if __name__ == "__main__":
+    main()
+
 
 
 def PreProcessData(data):
